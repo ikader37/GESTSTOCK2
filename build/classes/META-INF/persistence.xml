@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="GestStockPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>geststock.classes.Vendres</class>
+    <class>geststock.classes.Client</class>
+    <class>geststock.classes.Facture</class>
+    <class>geststock.classes.Rangement</class>
+    <class>geststock.classes.Usagep</class>
+    <class>geststock.classes.Commande</class>
+    <class>geststock.classes.Utilisateurs</class>
+    <class>geststock.classes.Taxe</class>
+    <class>geststock.classes.Fournisseurs</class>
+    <class>geststock.classes.Categories</class>
+    <class>geststock.classes.Employes</class>
+    <class>geststock.classes.Roles</class>
+    <class>geststock.classes.Entreprise</class>
+    <class>geststock.classes.Articles</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/geststock?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.user" value="root"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.password" value=""/>
+    </properties>
+  </persistence-unit>
+</persistence>
