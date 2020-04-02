@@ -9,7 +9,7 @@ import geststock.ecrans.*;
 import geststock.dialog.ConfirmDialogSup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  *
@@ -20,6 +20,11 @@ public class UsersEcran extends javax.swing.JFrame {
     /**
      * Creates new form Rangement
      */
+    
+    
+    private JMenuBar menuBars;
+    
+    
     public void desactiverButton(JButton btn,boolean actif){
             btn.setEnabled(actif);
         }
@@ -39,6 +44,7 @@ public class UsersEcran extends javax.swing.JFrame {
         desactiverField(this.txt_passe_2, false);
         desactiverComboBox(this.cbox_role, false);
         desactiverButton(this.annuler, false);
+        this.setJMenuBar(menuBars);
     }
 
     /**
@@ -116,7 +122,7 @@ public class UsersEcran extends javax.swing.JFrame {
 
         txt_passe_1.setText("jPasswordField2");
 
-        cbox_role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbox_role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sécrétaire", "Caissier", "Administrateur" }));
 
         javax.swing.GroupLayout panelAddLayout = new javax.swing.GroupLayout(panelAdd);
         panelAdd.setLayout(panelAddLayout);

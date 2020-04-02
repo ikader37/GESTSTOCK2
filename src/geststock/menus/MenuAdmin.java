@@ -5,6 +5,9 @@
  */
 package geststock.menus;
 
+import geststock.ecrans.users.UsersEcran;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
 /**
@@ -28,6 +31,24 @@ public class MenuAdmin extends JMenuBar{
     private JMenuItem vendreItem;
     private JMenuItem lesVentes;
     private JMenuItem caisseItem;
+    
+    /**
+     * Utilisateur
+     */
+    private JMenu utilisqteurMenu;
+    private JMenuItem addUtilisateur;
+    private JFrame fenetre;
+
+    public JFrame getFenetre() {
+        return fenetre;
+    }
+
+    public void setFenetre(JFrame fenetre) {
+        this.fenetre = fenetre;
+    }
+    
+    
+    
     
     public MenuAdmin(){
         
@@ -56,6 +77,31 @@ public class MenuAdmin extends JMenuBar{
         this.ventesMenu.add(vendreItem);
         this.ventesMenu.add(lesVentes);
         this.ventesMenu.add(caisseItem);
+        
+        /**
+         * Utilisateur
+         */
+        utilisqteurMenu=new JMenu("Utilisateurs");
+        addUtilisateur=new JMenuItem("Ajouter utilisateur");
+        utilisqteurMenu.add(addUtilisateur);
+        
+        addUtilisateur.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                fenetre.setVisible(false);
+                fenetre.dispose();
+                UsersEcran ecU=new UsersEcran();
+                ecU.setVisible(true);
+                //ecU.setMenuBars();
+                
+                ecU.show();
+                
+            }
+        });
+        
+        this.add(parametre);
+        this.add(ventesMenu);
+        this.add(utilisqteurMenu);
     }
     
     
