@@ -5,6 +5,7 @@
  */
 package geststock.ecrans;
 
+import geststock.utilities.OutilUtilities;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -19,6 +20,7 @@ public class AccueilEcran extends javax.swing.JFrame {
      */
     public AccueilEcran() {
         initComponents();
+        OutilUtilities.fenetreCourante=this;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         
     }

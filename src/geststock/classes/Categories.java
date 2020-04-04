@@ -5,6 +5,7 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -166,5 +167,45 @@ public class Categories implements Serializable {
     public String toString() {
         return "geststock.classes.Categories[ id=" + id + " ]";
     }
+    
+    
+    
+    public boolean createCategorie(){
+        boolean b=false;
+        
+        try{
+            OutilUtilities.categorieJpa.create(this);
+            b=true;
+        }catch(Exception ex){
+            b=false;
+        }
+        return b;
+    }
+    
+    public List<Categories> listCategorieValide(){
+        
+        return OutilUtilities.categorieJpa.listValide();
+    }
+    
+    /**
+     * Cette fonction mettra a jour une categorie donnees
+     */
+    public Categories obtenirCategorie(){
+        return OutilUtilities.categorieJpa.findCategories(id);
+    }
+    
+    public boolean updateCategorie(){
+        boolean b=false;
+        try{
+            OutilUtilities.categorieJpa.edit(this);
+            b=true;
+        }catch(Exception e){
+            b=false;
+        }
+        return b;
+    }
+    
+    
+    
     
 }

@@ -5,6 +5,7 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -178,4 +179,36 @@ public class Rangement implements Serializable {
         return "geststock.classes.Rangement[ id=" + id + " ]";
     }
     
+    
+    public boolean createRangement(){
+        boolean b=false;
+        try{
+            OutilUtilities.rangJpa.create(this);
+            b=true;
+        }catch(Exception ex){
+            
+        }
+        return b;
+    }
+    
+    public List<Rangement> listRangementValide(){
+        
+        return OutilUtilities.rangJpa.listRangementValide();
+    }
+    
+    public boolean updateRangement(){
+        boolean b=false;
+        try{
+            OutilUtilities.rangJpa.edit(this);
+            b=true;
+        }catch(Exception ex){
+            b=false;
+        }
+        return b;
+    }
+    
+    
+    public Rangement obtenirRangement(){
+        return OutilUtilities.rangJpa.findRangement(id);
+    }
 }

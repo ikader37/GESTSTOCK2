@@ -5,11 +5,15 @@
  */
 package geststock.ecrans.users;
 
+import geststock.classes.Utilisateurs;
 import geststock.ecrans.*;
 import geststock.dialog.ConfirmDialogSup;
+import geststock.utilities.OutilUtilities;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.*;
+import java.util.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,31 +24,107 @@ public class UsersEcran extends javax.swing.JFrame {
     /**
      * Creates new form Rangement
      */
-    
-    
+    private String operation;
+    private Utilisateurs userAdd;
+    private DefaultTableModel modelTable = new DefaultTableModel();
+
     private JMenuBar menuBars;
-    
-    
-    public void desactiverButton(JButton btn,boolean actif){
-            btn.setEnabled(actif);
+
+    public void desactiverButton(JButton btn, boolean actif) {
+        btn.setEnabled(actif);
+    }
+
+    public void desactiverField(JTextField txt, boolean actif) {
+        txt.setEnabled(actif);
+    }
+
+    public void desactiverComboBox(JComboBox txt, boolean actif) {
+        txt.setEnabled(actif);
+    }
+
+    /**
+     * Cette fonctions remplira le jtable avec des utilisateurs
+     *
+     * @param users est la liste des utilisateurs a afficher dans la jtable
+     */
+    public void remplirTableau(List<Utilisateurs> users) {
+        int nombrepresent = modelTable.getRowCount();
+        //Verifier quil ny a rien dedans
+        int i = nombrepresent;
+        if (nombrepresent > 0) {
+            i--;
+            while (i >= 0) {
+                //Retirer les elemets du tableau
+                modelTable.removeRow(i);
+                i--;
+            }
         }
-     public void desactiverField(JTextField txt,boolean actif){
-            txt.setEnabled(actif);
+
+        /**
+         * Verifier que la liste passee en parametre n'est pas nulle
+         */
+        if (users != null) {
+            i = 1;
+            for (Utilisateurs u : users) {
+
+                modelTable.addRow(new String[]{i + "", u.getId() + "", u.getUsername(), u.getNom(), u.getPrenom(), u.getRole()});
+
+                i++;
+            }
         }
-      public void desactiverComboBox(JComboBox txt,boolean actif){
-            txt.setEnabled(actif);
-        }
+    }
+
     public UsersEcran() {
         initComponents();
-        
+        OutilUtilities.fenetreCourante=this;
         desactiverButton(this.save, false);
         desactiverField(txt_nom, false);
         desactiverField(this.txt_prenom, false);
         desactiverField(this.txt_passe_1, false);
         desactiverField(this.txt_passe_2, false);
+        desactiverField(this.txt_username, false);
         desactiverComboBox(this.cbox_role, false);
         desactiverButton(this.annuler, false);
-        this.setJMenuBar(menuBars);
+
+        /**
+         * Initialisons les colonnes de notre tableau
+         */
+        modelTable.addColumn("#");
+        modelTable.addColumn("Id");
+        modelTable.addColumn("Nom d'utilisateur");
+        modelTable.addColumn("Nom");
+        modelTable.addColumn("Prénom(s)");
+        modelTable.addColumn("Rôle");
+
+        userAdd = new Utilisateurs();
+        remplirTableau(userAdd.listUtilisateurValide());
+
+        this.setJMenuBar(OutilUtilities.menu);
+        this.setLocationRelativeTo(null);
+    }
+
+    /**
+     * Cette fonction permettra de mettre a vide les differents champs
+     */
+    public void renitialiserLesChamps() {
+        this.txt_nom.setText("");
+        this.txt_prenom.setText("");
+        this.txt_username.setText("");
+        this.txt_passe_1.setText("");
+        this.txt_passe_2.setText("");
+    }
+
+    /**
+     * Cette fonction remplie les champs en fonction de l'utilisateur envoye
+     *
+     * @param u
+     */
+    public void valeurChamp(Utilisateurs u) {
+
+        txt_nom.setText(u.getNom());
+        txt_prenom.setText(u.getPrenom());
+        cbox_role.setSelectedItem(u.getRole());
+        txt_username.setText(u.getUsername());
     }
 
     /**
@@ -70,9 +150,11 @@ public class UsersEcran extends javax.swing.JFrame {
         txt_passe_2 = new javax.swing.JPasswordField();
         txt_passe_1 = new javax.swing.JPasswordField();
         cbox_role = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        txt_username = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tqble = new javax.swing.JTable();
+        tableau = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         actualiser = new javax.swing.JButton();
         annuler = new javax.swing.JButton();
@@ -87,7 +169,10 @@ public class UsersEcran extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("GESTSTOCK");
 
-        time_to_day.setText("jLabel2");
+        time_to_day.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
+        time_to_day.setForeground(new java.awt.Color(255, 51, 0));
+        time_to_day.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        time_to_day.setText(new Date().toString());
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -97,7 +182,7 @@ public class UsersEcran extends javax.swing.JFrame {
                 .addGap(109, 109, 109)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(time_to_day, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(time_to_day, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -124,35 +209,40 @@ public class UsersEcran extends javax.swing.JFrame {
 
         cbox_role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sécrétaire", "Caissier", "Administrateur" }));
 
+        jLabel7.setText("Nom d'utilisateur:");
+
         javax.swing.GroupLayout panelAddLayout = new javax.swing.GroupLayout(panelAdd);
         panelAdd.setLayout(panelAddLayout);
         panelAddLayout.setHorizontalGroup(
             panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelAddLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(panelAddLayout.createSequentialGroup()
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txt_username))
                     .addGroup(panelAddLayout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(txt_nom, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(panelAddLayout.createSequentialGroup()
-                            .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGap(18, 18, 18)
-                            .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txt_prenom)
-                                .addComponent(txt_passe_1)))
-                        .addGroup(panelAddLayout.createSequentialGroup()
-                            .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(18, 18, 18)
-                            .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txt_passe_2, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
-                                .addComponent(cbox_role, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                .addContainerGap(624, Short.MAX_VALUE))
+                    .addGroup(panelAddLayout.createSequentialGroup()
+                        .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_prenom)
+                            .addComponent(txt_passe_1)))
+                    .addGroup(panelAddLayout.createSequentialGroup()
+                        .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_passe_2)
+                            .addComponent(cbox_role, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelAddLayout.setVerticalGroup(
             panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,39 +255,35 @@ public class UsersEcran extends javax.swing.JFrame {
                 .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txt_prenom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelAddLayout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 9, Short.MAX_VALUE))
+                .addGap(4, 4, 4)
+                .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelAddLayout.createSequentialGroup()
                         .addGap(8, 8, 8)
-                        .addComponent(txt_passe_1)))
+                        .addComponent(txt_username, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_passe_1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelAddLayout.createSequentialGroup()
                         .addComponent(txt_passe_2, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
                         .addGap(5, 5, 5)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbox_role, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        tqble.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        tableau.setModel(modelTable);
+        tableau.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableauMouseClicked(evt);
             }
-        ));
-        jScrollPane1.setViewportView(tqble);
+        });
+        jScrollPane1.setViewportView(tableau);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -315,7 +401,7 @@ public class UsersEcran extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panelAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -327,44 +413,49 @@ public class UsersEcran extends javax.swing.JFrame {
 
     private void supprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supprimerActionPerformed
         // TODO add your handling code here:
-        ConfirmDialogSup conf=new ConfirmDialogSup(this, true);
+        ConfirmDialogSup conf = new ConfirmDialogSup(this, true);
         conf.show();
-        
-      
-        
+
+
     }//GEN-LAST:event_supprimerActionPerformed
 
     private void nouveauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nouveauActionPerformed
         // TODO add your handling code here:
         desactiverButton(this.modifier, false);
+        desactiverButton(this.nouveau, false);
         desactiverField(this.txt_prenom, true);
         desactiverField(this.txt_nom, true);
         desactiverButton(this.save, true);
         desactiverField(txt_nom, true);
         desactiverField(this.txt_passe_1, true);
         desactiverField(this.txt_passe_2, true);
+        desactiverField(this.txt_username, true);
+
         desactiverComboBox(this.cbox_role, true);
         desactiverButton(this.annuler, true);
         desactiverButton(this.supprimer, false);
-        
+
+        this.operation = "new";
+        userAdd = new Utilisateurs();
+        renitialiserLesChamps();
+
     }//GEN-LAST:event_nouveauActionPerformed
 
     private void actualiserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualiserActionPerformed
         // TODO add your handling code here:
-        
+
         desactiverField(txt_nom, false);
         desactiverField(this.txt_prenom, false);
         desactiverField(this.txt_passe_1, false);
         desactiverField(this.txt_passe_2, false);
         desactiverComboBox(this.cbox_role, false);
-        
+        desactiverField(this.txt_username, false);
         desactiverButton(this.save, false);
         desactiverButton(this.annuler, false);
         desactiverButton(this.nouveau, true);
         desactiverButton(this.supprimer, true);
-        
-        
-        
+
+
     }//GEN-LAST:event_actualiserActionPerformed
 
     private void modifierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifierActionPerformed
@@ -376,18 +467,114 @@ public class UsersEcran extends javax.swing.JFrame {
         desactiverField(this.txt_passe_1, true);
         desactiverField(this.txt_passe_2, true);
         desactiverComboBox(this.cbox_role, true);
+        desactiverField(this.txt_username, true);
+        this.operation = "mod";
+        if (tableau.getSelectedRow() < 0) {
+            String id = tableau.getValueAt(0, 1).toString();
+            userAdd.setId(Integer.parseInt(id));
+            userAdd = userAdd.obtenirUtilisateur();
+            valeurChamp(userAdd);
+        } else {
+            valeurChamp(userAdd);
+        }
     }//GEN-LAST:event_modifierActionPerformed
+
+    /**
+     * Cette metode sera executee si on clique sur le bouton enregistrer
+     *
+     * @param evt
+     */
 
     private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
         // TODO add your handling code here:
-        
-        desactiverButton(this.save, false);
-        desactiverField(txt_nom, false);
-        desactiverField(this.txt_prenom, false);
-        desactiverField(this.txt_passe_1, false);
-        desactiverField(this.txt_passe_2, false);
-        desactiverComboBox(this.cbox_role, false);
-        desactiverButton(this.annuler, false);
+        /**
+         * Recuperons les valeuurs des diferents champs saisi
+         */
+
+        String nom = txt_nom.getText().toString().trim().toUpperCase();
+        String prenom = txt_prenom.getText().toString().trim();
+        String username = txt_username.getText().toString().trim();
+        String pass1 = txt_passe_1.getText().toString().trim();
+        String pass2 = txt_passe_2.getText().toString().trim();
+        String role = cbox_role.getSelectedItem().toString().trim();
+
+        userAdd.setNom(nom);
+        userAdd.setPrenom(prenom);
+        userAdd.setRole(role);
+        userAdd.setUsername(username);
+
+        /**
+         * Verifions sil s'agit d'un nouvel utilisateur ou une modification
+         *
+         */
+        if (this.operation.equalsIgnoreCase("new")) {
+
+            userAdd.setCreatedAt(new Date());
+            userAdd.setUpdatedAt(new Date());
+            /**
+             * Si les mots de passe sont identiques On peut enregistrer cette
+             * personne. Sinon on enevoie une erreur
+             */
+            if (pass1.equals(pass2)) {
+                pass1 = OutilUtilities.md5Java(pass1);
+                userAdd.setMotdepasse(pass1);
+                boolean b = userAdd.createUtilisateur();
+                /**
+                 * Verifions que la creation fut un success
+                 */
+                if (b) {
+                    OutilUtilities.afficherMessage("Enregistrement réussi avec success!!");
+
+                    desactiverButton(this.save, false);
+                    desactiverField(txt_nom, false);
+                    desactiverField(this.txt_prenom, false);
+                    desactiverField(this.txt_passe_1, false);
+                    desactiverField(this.txt_username, false);
+                    desactiverField(this.txt_passe_2, false);
+                    desactiverComboBox(this.cbox_role, false);
+
+                    desactiverButton(this.annuler, false);
+                    desactiverButton(this.supprimer, true);
+                    desactiverButton(this.modifier, true);
+
+                    /**
+                     * Remettrons les valeurs ddes champs a zeros
+                     *
+                     */
+                    renitialiserLesChamps();
+                } else {
+                    OutilUtilities.afficherMessageErreur("Enregistrement échoué!!");
+                }
+
+            } else {
+                OutilUtilities.afficherMessage("Mot de passe incorrect!!\n Veuillez réessayer svp.");
+            }
+        } else {
+            userAdd.setUpdatedAt(new Date());
+
+            /**
+             * Desactivons les boutons et mettons a gris les differents champs
+             */
+            desactiverButton(this.save, false);
+            desactiverField(txt_nom, false);
+            desactiverField(this.txt_prenom, false);
+            desactiverField(this.txt_passe_1, false);
+            desactiverField(this.txt_username, false);
+            desactiverField(this.txt_passe_2, false);
+            desactiverComboBox(this.cbox_role, false);
+
+            desactiverButton(this.annuler, false);
+            desactiverButton(this.supprimer, true);
+            desactiverButton(this.modifier, true);
+
+            /**
+             * Remettrons les valeurs ddes champs a zeros
+             *
+             */
+            renitialiserLesChamps();
+        }
+        System.out.println(userAdd.listUtilisateurValide().size());
+
     }//GEN-LAST:event_saveActionPerformed
 
     private void annulerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annulerActionPerformed
@@ -398,9 +585,21 @@ public class UsersEcran extends javax.swing.JFrame {
         desactiverField(this.txt_passe_1, false);
         desactiverField(this.txt_passe_2, false);
         desactiverComboBox(this.cbox_role, false);
-        desactiverButton(this.annuler, true);
-        
+        desactiverButton(this.annuler, false);
+        //desactiverButton(this., rootPaneCheckingEnabled);
+        desactiverField(txt_username, false);
+        System.out.println(userAdd.listUtilisateurValide().size());
     }//GEN-LAST:event_annulerActionPerformed
+
+    private void tableauMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableauMouseClicked
+        // TODO add your handling code here:
+        int index = tableau.getSelectedRow();
+        String id = tableau.getValueAt(index, 1).toString();
+        System.out.println(id + "  " + index);
+        userAdd.setId(Integer.parseInt(id));
+        userAdd = userAdd.obtenirUtilisateur();
+
+    }//GEN-LAST:event_tableauMouseClicked
 
     /**
      * @param args the command line arguments
@@ -430,14 +629,10 @@ public class UsersEcran extends javax.swing.JFrame {
         //</editor-fold>
 
         //</editor-fold>
-
         //</editor-fold>
-
         //</editor-fold>
 
         /* Create and display the form */
-        
-        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new UsersEcran().setVisible(true);
@@ -455,6 +650,7 @@ public class UsersEcran extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -464,11 +660,12 @@ public class UsersEcran extends javax.swing.JFrame {
     private javax.swing.JPanel panelAdd;
     private javax.swing.JButton save;
     private javax.swing.JButton supprimer;
+    private javax.swing.JTable tableau;
     private javax.swing.JLabel time_to_day;
-    private javax.swing.JTable tqble;
     private javax.swing.JTextField txt_nom;
     private javax.swing.JPasswordField txt_passe_1;
     private javax.swing.JPasswordField txt_passe_2;
     private javax.swing.JTextField txt_prenom;
+    private javax.swing.JTextField txt_username;
     // End of variables declaration//GEN-END:variables
 }

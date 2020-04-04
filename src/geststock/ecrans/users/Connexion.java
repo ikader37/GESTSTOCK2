@@ -5,8 +5,10 @@
  */
 package geststock.ecrans.users;
 
+import geststock.classes.Utilisateurs;
 import geststock.ecrans.AccueilEcran;
 import geststock.menus.MenuAdmin;
+import geststock.utilities.OutilUtilities;
 
 /**
  *
@@ -17,9 +19,12 @@ public class Connexion extends javax.swing.JDialog {
     /**
      * Creates new form Connexion
      */
+    private Utilisateurs user = new Utilisateurs();
+
     public Connexion(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -61,7 +66,6 @@ public class Connexion extends javax.swing.JDialog {
         txt_username.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         txt_passwd.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txt_passwd.setText("jPasswordField1");
 
         jButton1.setBackground(new java.awt.Color(51, 204, 0));
         jButton1.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
@@ -139,13 +143,22 @@ public class Connexion extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        AccueilEcran ec=new AccueilEcran();
-        MenuAdmin ad=new MenuAdmin();
+
+        user.setUsername(txt_username.getText().toString().trim());
+        user.setMotdepasse(OutilUtilities.md5Java(txt_passwd.getText().toString().trim()));
+        Utilisateurs u = user.authentification();
+        if (u == null) {
+            OutilUtilities.afficherMessageErreur("Erreur!! VOs identifiants sont incorrects.");
+        } else {
+            AccueilEcran ec = new AccueilEcran();
+            ec.setJMenuBar(OutilUtilities.menu);
+            //OutilUtilities.fenetreCourante=this;
+            //((MenuAdmin)OutilUtilities.menu).setFenetre(ec);
+            ec.show();
+            this.setVisible(false);
+        }
+
         
-        ec.setJMenuBar(ad);
-        ad.setFenetre(ec);
-        ec.show();
-        this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

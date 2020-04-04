@@ -5,6 +5,7 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -258,4 +259,35 @@ public class Utilisateurs implements Serializable {
         return "geststock.classes.Utilisateurs[ id=" + id + " ]";
     }
     
+    /**
+     * Cette methode permettra de creer un utilisateur
+     */
+    public boolean createUtilisateur(){
+        boolean b=false;
+        try {
+            OutilUtilities.userJpa.create(this);
+            b=true;
+        } catch (Exception e) {
+            b=false;
+        }
+        return b;
+    }
+    
+    
+    /**
+     * Obtenir la liste des utilisateurs valides
+     * @return 
+     */
+    public List<Utilisateurs> listUtilisateurValide(){
+        
+        return OutilUtilities.userJpa.listUtilisateurValide();
+    }
+    
+    public Utilisateurs obtenirUtilisateur(){
+        return OutilUtilities.userJpa.findUtilisateurs(this.id);
+    }
+    
+    public Utilisateurs authentification(){
+        return OutilUtilities.userJpa.authentification(this);
+    }  
 }

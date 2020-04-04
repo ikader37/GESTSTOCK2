@@ -5,7 +5,9 @@
  */
 package geststock.menus;
 
+import geststock.ecrans.CategorieEcran;
 import geststock.ecrans.users.UsersEcran;
+import geststock.utilities.OutilUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -83,13 +85,21 @@ public class MenuAdmin extends JMenuBar{
          */
         utilisqteurMenu=new JMenu("Utilisateurs");
         addUtilisateur=new JMenuItem("Ajouter utilisateur");
+        
         utilisqteurMenu.add(addUtilisateur);
         
+        /**
+         * Nous mettrons des actions derriere chaque menu
+         * 
+         */
         addUtilisateur.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                fenetre.setVisible(false);
-                fenetre.dispose();
+                //fenetre.setVisible(false);
+                //fenetre.dispose();
+                OutilUtilities.fenetreCourante.setVisible(false);
+                OutilUtilities.fenetreCourante.dispose();
+                
                 UsersEcran ecU=new UsersEcran();
                 ecU.setVisible(true);
                 //ecU.setMenuBars();
@@ -98,6 +108,30 @@ public class MenuAdmin extends JMenuBar{
                 
             }
         });
+        
+        
+        
+        entrepriseMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+            
+            
+            }
+        });
+        
+        categorieMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+            
+                OutilUtilities.fenetreCourante.setVisible(false);
+                OutilUtilities.fenetreCourante.dispose();
+                CategorieEcran ec=new CategorieEcran();
+                ec.setVisible(true);
+            
+            }
+        });
+        
+        
         
         this.add(parametre);
         this.add(ventesMenu);

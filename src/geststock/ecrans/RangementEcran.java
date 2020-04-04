@@ -5,9 +5,14 @@
  */
 package geststock.ecrans;
 
+import geststock.classes.Rangement;
 import geststock.dialog.ConfirmDialogSup;
+import geststock.utilities.OutilUtilities;
+import  java.util.*;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,22 +20,71 @@ import javax.swing.JTextField;
  */
 public class RangementEcran extends javax.swing.JFrame {
 
+    private DefaultTableModel modelTable = new DefaultTableModel();
+    private String operation;
+    private Rangement rangement = new Rangement();
+
+    public void desactiverButton(JButton btn, boolean actif) {
+        btn.setEnabled(actif);
+    }
+
+    public void desactiverField(JTextField txt, boolean actif) {
+        txt.setEnabled(actif);
+    }
+    
+    
+    /**
+     * Cette fonctions remplira le jtable avec des rangees
+     *
+     * @param users est la liste des rangees a afficher dans la jtable
+     */
+    public void remplirTableau(List<Rangement> rs) {
+        int nombrepresent = modelTable.getRowCount();
+        //Verifier quil ny a rien dedans
+        int i = nombrepresent;
+        if (nombrepresent > 0) {
+            i--;
+            while (i >= 0) {
+                //Retirer les elemets du tableau
+                modelTable.removeRow(i);
+                i--;
+            }
+        }
+
+        /**
+         * Verifier que la liste passee en parametre n'est pas nulle
+         */
+        if (rs != null) {
+            i = 1;
+            for (Rangement r : rs) {
+                
+                modelTable.addRow(new String[]{i + "", r.getId() + "", r.getLibelle(),r.getDesignation()});
+                
+                i++;
+            }
+        }
+    }
+    
+    
+
     /**
      * Creates new form Rangement
      */
-    public void desactiverButton(JButton btn,boolean actif){
-            btn.setEnabled(actif);
-        }
-     public void desactiverField(JTextField txt,boolean actif){
-            txt.setEnabled(actif);
-        }
     public RangementEcran() {
         initComponents();
-        
+
         desactiverButton(this.save, false);
         desactiverField(txt_nom, false);
         desactiverField(this.txt_design, false);
         desactiverButton(this.annuler, false);
+
+        modelTable.addColumn("#");
+        modelTable.addColumn("Id");
+        modelTable.addColumn("Nom");
+        modelTable.addColumn("Désignation");
+        
+        remplirTableau(rangement.listRangementValide());
+
     }
 
     /**
@@ -52,7 +106,7 @@ public class RangementEcran extends javax.swing.JFrame {
         txt_design = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tqble = new javax.swing.JTable();
+        tableau = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         actualiser = new javax.swing.JButton();
         annuler = new javax.swing.JButton();
@@ -120,18 +174,13 @@ public class RangementEcran extends javax.swing.JFrame {
                 .addContainerGap(75, Short.MAX_VALUE))
         );
 
-        tqble.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        tableau.setModel(modelTable);
+        tableau.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableauMouseClicked(evt);
             }
-        ));
-        jScrollPane1.setViewportView(tqble);
+        });
+        jScrollPane1.setViewportView(tableau);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -157,9 +206,19 @@ public class RangementEcran extends javax.swing.JFrame {
 
         annuler.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Deletepx.png"))); // NOI18N
         annuler.setText("Annuler");
+        annuler.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                annulerActionPerformed(evt);
+            }
+        });
 
         save.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Savepx.png"))); // NOI18N
         save.setText("Enregistrer");
+        save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveActionPerformed(evt);
+            }
+        });
 
         modifier.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Edit Propertypx.png"))); // NOI18N
         modifier.setText("Modifier");
@@ -249,20 +308,46 @@ public class RangementEcran extends javax.swing.JFrame {
 
     private void supprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supprimerActionPerformed
         // TODO add your handling code here:
-        ConfirmDialogSup conf=new ConfirmDialogSup(this, true);
-        conf.show();
+        if(tableau.getSelectedRow()>0){
+            
+        }else{
+            int id=Integer.parseInt((String)tableau.getValueAt(0, 1));
+            
+            rangement.setId(id);
+            rangement=rangement.obtenirRangement();
+        }
         
-      
+         int i = JOptionPane.showConfirmDialog(null, "Voulez vous vraiment supprimer ?");
+        if (i == JOptionPane.YES_OPTION) {
+            rangement.setUpdatedAt(new Date());
+            rangement.setDeleted(true);
+            rangement.setUpdatedBy(OutilUtilities.userActuel.getId());
+            boolean b=rangement.updateRangement();
+            if(b){
+                OutilUtilities.afficherMessage("Suppression réussi!!");
+                rangement=new Rangement();
+            }else{
+                OutilUtilities.afficherMessageErreur("Suppression échouée");
+            }
+        }else{
+            OutilUtilities.afficherMessage("Suppression annulée");
+        }
+        remplirTableau(rangement.listRangementValide());
         
+
     }//GEN-LAST:event_supprimerActionPerformed
 
     private void nouveauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nouveauActionPerformed
         // TODO add your handling code here:
         desactiverButton(this.modifier, false);
+        desactiverButton(this.supprimer, false);
+        annuler.setEnabled(true);
+        save.setEnabled(true);
         desactiverField(this.txt_design, true);
         desactiverField(this.txt_nom, true);
-        
-        
+        this.operation = "new";
+
+
     }//GEN-LAST:event_nouveauActionPerformed
 
     private void actualiserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualiserActionPerformed
@@ -275,9 +360,135 @@ public class RangementEcran extends javax.swing.JFrame {
 
     private void modifierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifierActionPerformed
         // TODO add your handling code here:
+        
         desactiverButton(this.save, true);
         desactiverButton(this.annuler, true);
+        modifier.setEnabled(false);
+        actualiser.setEnabled(true);
+        nouveau.setEnabled(false);
+        
+        
+        txt_design.setEnabled(true);
+        txt_nom.setEnabled(true);
+        
+        operation="mod";
+        
+        if(tableau.getSelectedRow()>0){
+        }else{
+            int id=Integer.parseInt((String)tableau.getValueAt(0, 1));
+            
+            rangement.setId(id);
+            rangement=rangement.obtenirRangement();
+        }
+        txt_nom.setText(rangement.getLibelle());
+        txt_design.setText(rangement.getDesignation());
+        
     }//GEN-LAST:event_modifierActionPerformed
+
+    private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
+        // TODO add your handling code here:
+
+        if (this.operation == "new") {
+            rangement.setLibelle(txt_nom.getText().toString().trim());
+            rangement.setDesignation(txt_design.getText().toString().trim());
+            rangement.setCreatedAt(new Date());
+            rangement.setUpdatedAt(new Date());
+            rangement.setUpdatedBy(OutilUtilities.userActuel.getId());
+            rangement.setCreatedBy(OutilUtilities.userActuel.getId());
+            boolean b = rangement.createRangement();
+            if (b) {
+
+                OutilUtilities.afficherMessage("Enregistrement réussi");
+                txt_design.setText("");
+                txt_nom.setText("");
+                txt_design.setEnabled(false);
+                txt_nom.setEnabled(false);
+
+                save.setEnabled(false);
+                nouveau.setEnabled(true);
+                modifier.setEnabled(true);
+                supprimer.setEnabled(true);
+                annuler.setEnabled(true);
+                actualiser.setEnabled(true);
+
+                rangement = new Rangement();
+            } else {
+
+                OutilUtilities.afficherMessageErreur("Enregistrement échoué!Veuillez réessayer! ");
+
+                txt_design.setEnabled(false);
+                txt_nom.setEnabled(false);
+
+                save.setEnabled(false);
+                nouveau.setEnabled(true);
+                modifier.setEnabled(true);
+                supprimer.setEnabled(true);
+                annuler.setEnabled(true);
+                actualiser.setEnabled(true);
+
+            }
+        } else {
+            rangement.setLibelle(txt_nom.getText().toString().trim());
+            rangement.setDesignation(txt_design.getText().toString().trim());
+            rangement.setUpdatedAt(new Date());
+            rangement.setUpdatedBy(OutilUtilities.userActuel.getId());
+
+            boolean b = rangement.updateRangement();
+            if (b) {
+                OutilUtilities.afficherMessage("Mise à jour réussi");
+
+                txt_design.setText("");
+                txt_nom.setText("");
+                txt_design.setEnabled(false);
+                txt_nom.setEnabled(false);
+
+                save.setEnabled(false);
+                nouveau.setEnabled(true);
+                modifier.setEnabled(true);
+                supprimer.setEnabled(true);
+                annuler.setEnabled(true);
+                actualiser.setEnabled(true);
+
+                rangement = new Rangement();
+
+            } else {
+                OutilUtilities.afficherMessageErreur("Mise à jour échoué!Veuillez réessayer! ");
+
+                txt_design.setEnabled(false);
+                txt_nom.setEnabled(false);
+
+                save.setEnabled(false);
+                nouveau.setEnabled(true);
+                modifier.setEnabled(true);
+                supprimer.setEnabled(true);
+                annuler.setEnabled(true);
+                actualiser.setEnabled(true);
+            }
+        }
+         remplirTableau(rangement.listRangementValide());
+
+    }//GEN-LAST:event_saveActionPerformed
+
+    private void tableauMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableauMouseClicked
+        // TODO add your handling code here:
+        
+        int index=tableau.getSelectedRow();
+            int id=Integer.parseInt((String)tableau.getValueAt(index, 1));
+            
+            rangement.setId(id);
+            rangement=rangement.obtenirRangement();
+            
+    }//GEN-LAST:event_tableauMouseClicked
+
+    private void annulerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annulerActionPerformed
+        // TODO add your handling code here:
+        
+        save.setEnabled(false);
+        nouveau.setEnabled(true);
+        modifier.setEnabled(true);
+        supprimer.setEnabled(true);
+        actualiser.setEnabled(true);
+    }//GEN-LAST:event_annulerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -309,8 +520,6 @@ public class RangementEcran extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        
-        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new RangementEcran().setVisible(true);
@@ -333,8 +542,8 @@ public class RangementEcran extends javax.swing.JFrame {
     private javax.swing.JPanel panelAdd;
     private javax.swing.JButton save;
     private javax.swing.JButton supprimer;
+    private javax.swing.JTable tableau;
     private javax.swing.JLabel time_to_day;
-    private javax.swing.JTable tqble;
     private javax.swing.JTextField txt_design;
     private javax.swing.JTextField txt_nom;
     // End of variables declaration//GEN-END:variables

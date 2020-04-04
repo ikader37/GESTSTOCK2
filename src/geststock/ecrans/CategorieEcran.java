@@ -5,32 +5,88 @@
  */
 package geststock.ecrans;
 
+import geststock.classes.Categories;
+import geststock.classes.Utilisateurs;
 import geststock.dialog.ConfirmDialogSup;
+import geststock.utilities.OutilUtilities;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import java.util.Date;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author DELL
  */
 public class CategorieEcran extends javax.swing.JFrame {
+    
+    private Categories categorie = new Categories();
+    private DefaultTableModel modelTable = new DefaultTableModel();
+    private String operation;
 
     /**
-     * Creates new form Rangement
+     * Cette fonctions remplira le jtable avec des categories
+     *
+     * @param users est la liste des categories a afficher dans la jtable
      */
-    public void desactiverButton(JButton btn,boolean actif){
-            btn.setEnabled(actif);
+    public void remplirTableau(List<Categories> cs) {
+        int nombrepresent = modelTable.getRowCount();
+        //Verifier quil ny a rien dedans
+        int i = nombrepresent;
+        if (nombrepresent > 0) {
+            i--;
+            while (i >= 0) {
+                //Retirer les elemets du tableau
+                modelTable.removeRow(i);
+                i--;
+            }
         }
-     public void desactiverField(JTextField txt,boolean actif){
-            txt.setEnabled(actif);
+
+        /**
+         * Verifier que la liste passee en parametre n'est pas nulle
+         */
+        if (cs != null) {
+            i = 1;
+            for (Categories c : cs) {
+                
+                modelTable.addRow(new String[]{i + "", c.getId() + "", c.getLibelle()});
+                
+                i++;
+            }
         }
+    }
+
+   /**
+    * Cette fonction choisi d'activer ou desactiver un bouton
+    * @param btn
+    * @param actif 
+    */
+    public void desactiverButton(JButton btn, boolean actif) {
+        btn.setEnabled(actif);
+    }
+    
+    /**
+     * Cette fonction choisi d'activer ou desactiverun champ
+     * @param txt
+     * @param actif 
+     */
+    public void desactiverField(JTextField txt, boolean actif) {
+        txt.setEnabled(actif);
+    }
+    
     public CategorieEcran() {
         initComponents();
-        
+        OutilUtilities.fenetreCourante = this;
         desactiverButton(this.save, false);
         desactiverField(txt_libelle, false);
         desactiverButton(this.annuler, false);
+        modelTable.addColumn("#");
+        modelTable.addColumn("Id");
+        modelTable.addColumn("Libéllé");
+        remplirTableau(categorie.listCategorieValide());
     }
 
     /**
@@ -50,7 +106,7 @@ public class CategorieEcran extends javax.swing.JFrame {
         txt_libelle = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tqble = new javax.swing.JTable();
+        tableau = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         actualiser = new javax.swing.JButton();
         annuler = new javax.swing.JButton();
@@ -109,18 +165,13 @@ public class CategorieEcran extends javax.swing.JFrame {
                 .addContainerGap(140, Short.MAX_VALUE))
         );
 
-        tqble.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        tableau.setModel(modelTable);
+        tableau.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableauMouseClicked(evt);
             }
-        ));
-        jScrollPane1.setViewportView(tqble);
+        });
+        jScrollPane1.setViewportView(tableau);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -146,9 +197,19 @@ public class CategorieEcran extends javax.swing.JFrame {
 
         annuler.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Deletepx.png"))); // NOI18N
         annuler.setText("Annuler");
+        annuler.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                annulerActionPerformed(evt);
+            }
+        });
 
         save.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Savepx.png"))); // NOI18N
         save.setText("Enregistrer");
+        save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveActionPerformed(evt);
+            }
+        });
 
         modifier.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Edit Propertypx.png"))); // NOI18N
         modifier.setText("Modifier");
@@ -179,10 +240,10 @@ public class CategorieEcran extends javax.swing.JFrame {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addGap(38, 38, 38)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(nouveau, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(supprimer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(supprimer, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(modifier, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -197,13 +258,14 @@ public class CategorieEcran extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(supprimer, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
-                        .addComponent(nouveau, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(modifier, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(save, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(annuler, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(actualiser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(actualiser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(supprimer, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(nouveau, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -238,19 +300,64 @@ public class CategorieEcran extends javax.swing.JFrame {
 
     private void supprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supprimerActionPerformed
         // TODO add your handling code here:
-        ConfirmDialogSup conf=new ConfirmDialogSup(this, true);
-        conf.show();
+        ConfirmDialogSup conf = new ConfirmDialogSup(this, true);
+        //conf.getOk().addActionListener(new );
+        int index = tableau.getSelectedRow();
+        int i = JOptionPane.showConfirmDialog(null, "Voulez vous vraiment supprimer ");
+        if (i == JOptionPane.YES_OPTION) {
+            
+            if (index > 0) {
+                int id = Integer.parseInt((String) tableau.getValueAt(index, 1));
+                categorie = categorie.obtenirCategorie();
+                
+            } else {
+                int id = Integer.parseInt((String) tableau.getValueAt(0, 1));
+                categorie = categorie.obtenirCategorie();
+                
+            }
+            txt_libelle.setText(categorie.getLibelle());
+            categorie.setUpdatedAt(new Date());
+            categorie.setDeleted(true);
+            categorie.setCupdatedBy(OutilUtilities.userActuel.getId());
+            boolean b = categorie.updateCategorie();
+            if (b) {
+                OutilUtilities.afficherMessage("Suppression réussie!");
+                categorie=new Categories();
+                txt_libelle.setText("");
+                
+                desactiverButton(save, false);
+                desactiverButton(nouveau, true);
+                desactiverButton(modifier, true);
+                desactiverButton(supprimer, true);
+                desactiverButton(actualiser, true);
+                desactiverField(txt_libelle, false);
+                
+            } else {
+                OutilUtilities.afficherMessageErreur("Suppression échouée!");
+            }
+        } else {
+            OutilUtilities.afficherMessageErreur("Operation supprimée avec success!");
+        }
         
-      
-        
+        remplirTableau(categorie.listCategorieValide());
+
+        // conf.show();
+
     }//GEN-LAST:event_supprimerActionPerformed
 
     private void nouveauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nouveauActionPerformed
         // TODO add your handling code here:
         desactiverButton(this.modifier, false);
+        desactiverButton(this.save, true);
+        desactiverButton(this.nouveau, false);
+        
         desactiverField(this.txt_libelle, true);
+        desactiverButton(this.annuler, true);
         
+        desactiverButton(this.supprimer, false);
+        operation = "new";
         
+
     }//GEN-LAST:event_nouveauActionPerformed
 
     private void actualiserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualiserActionPerformed
@@ -263,9 +370,79 @@ public class CategorieEcran extends javax.swing.JFrame {
 
     private void modifierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifierActionPerformed
         // TODO add your handling code here:
+        operation = "mod";
         desactiverButton(this.save, true);
         desactiverButton(this.annuler, true);
+        desactiverButton(nouveau, false);
+        if(tableau.getSelectedRow()>0){
+            int index = tableau.getSelectedRow();
+            int id=Integer.parseInt((String)tableau.getValueAt(index, 1));
+            categorie.setId(id);
+            categorie=categorie.obtenirCategorie();
+        }else{
+            int id=Integer.parseInt((String)tableau.getValueAt(0, 1));
+            categorie.setId(id);
+            categorie=categorie.obtenirCategorie();
+        }
+        
+        txt_libelle.setText(categorie.getLibelle());
+        desactiverField(txt_libelle, true);
+        
+
     }//GEN-LAST:event_modifierActionPerformed
+
+    private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
+        // TODO add your handling code here:
+
+        categorie.setLibelle(txt_libelle.getText().toString().trim());
+        
+        if (operation == "new") {
+            boolean b = categorie.createCategorie();
+            if (b) {
+                OutilUtilities.afficherMessage("Enregistrement réussi.");
+                txt_libelle.setText("");
+                txt_libelle.setVisible(false);
+                desactiverButton(save, false);
+                desactiverButton(nouveau, true);
+                desactiverButton(modifier, true);
+                desactiverButton(annuler, true);
+                desactiverButton(actualiser, true);
+                desactiverButton(supprimer, true);
+            } else {
+                OutilUtilities.afficherMessageErreur("Enregistrement échoué!!\n Veuillez réessayer seulement.");
+            }
+            categorie = new Categories();
+        } else if (operation == "mod") {
+            boolean b = categorie.updateCategorie();
+            if (b) {
+                OutilUtilities.afficherMessage("Mise à jour réussi.");
+            } else {
+                OutilUtilities.afficherMessageErreur("Mise à jour échouée!!\n Veuillez réessayer seulement.");
+            }
+        }
+        
+        remplirTableau(categorie.listCategorieValide());
+
+    }//GEN-LAST:event_saveActionPerformed
+
+    private void tableauMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableauMouseClicked
+        // TODO add your handling code here:
+
+        int index = tableau.getSelectedRow();
+        int id = Integer.parseInt((String) tableau.getValueAt(index, 1));
+        categorie.setId(id);
+    }//GEN-LAST:event_tableauMouseClicked
+
+    private void annulerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annulerActionPerformed
+        // TODO add your handling code here:
+        
+        desactiverButton(save, false);
+        desactiverButton(nouveau, true);
+        desactiverButton(modifier, true);
+        desactiverButton(supprimer, true);
+        desactiverButton(actualiser, true);
+        txt_libelle.setText("");
+    }//GEN-LAST:event_annulerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -295,14 +472,10 @@ public class CategorieEcran extends javax.swing.JFrame {
         //</editor-fold>
 
         //</editor-fold>
-
         //</editor-fold>
-
         //</editor-fold>
 
         /* Create and display the form */
-        
-        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new CategorieEcran().setVisible(true);
@@ -324,8 +497,8 @@ public class CategorieEcran extends javax.swing.JFrame {
     private javax.swing.JPanel panelAdd;
     private javax.swing.JButton save;
     private javax.swing.JButton supprimer;
+    private javax.swing.JTable tableau;
     private javax.swing.JLabel time_to_day;
-    private javax.swing.JTable tqble;
     private javax.swing.JTextField txt_libelle;
     // End of variables declaration//GEN-END:variables
 }

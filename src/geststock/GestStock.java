@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package geststock;
+import geststock.utilities.*;
 
 /**
  *
@@ -16,6 +17,9 @@ public class GestStock {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        System.out.println(OutilUtilities.md5Java("je t'aime"));
+         System.out.println(OutilUtilities.md5Java("je t'aime"));
+         
     }
     
 }
