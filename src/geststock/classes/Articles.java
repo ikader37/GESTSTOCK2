@@ -5,10 +5,12 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -67,9 +69,9 @@ public class Articles implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Column(name = "CREATED_BY")
-    private String createdBy;
+    private int createdBy;
     @Column(name = "UPDATED_BY")
-    private String updatedBy;
+    private int updatedBy;
     @Column(name = "PRIX_UNITAIRE")
     private Integer prixUnitaire;
     @Column(name = "DATE_SORTIE")
@@ -97,6 +99,8 @@ public class Articles implements Serializable {
     @JoinColumn(name = "idrangemennt", referencedColumnName = "id")
     @ManyToOne
     private Rangement idrangemennt;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "articles")
+    private List<Articlecommande> articlecommandeList;
 
     public Articles() {
     }
@@ -150,19 +154,19 @@ public class Articles implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getCreatedBy() {
+    public int getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(int createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getUpdatedBy() {
+    public int getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(String updatedBy) {
+    public void setUpdatedBy(int updatedBy) {
         this.updatedBy = updatedBy;
     }
 
@@ -254,6 +258,15 @@ public class Articles implements Serializable {
     public void setIdrangemennt(Rangement idrangemennt) {
         this.idrangemennt = idrangemennt;
     }
+    
+    @XmlTransient
+    public List<Articlecommande> getArticlecommandeList() {
+        return articlecommandeList;
+    }
+
+    public void setArticlecommandeList(List<Articlecommande> articlecommandeList) {
+        this.articlecommandeList = articlecommandeList;
+    }
 
     @Override
     public int hashCode() {
@@ -280,4 +293,43 @@ public class Articles implements Serializable {
         return "geststock.classes.Articles[ id=" + id + " ]";
     }
     
+    
+    public boolean createArticle(){
+        
+        boolean b=false;
+        
+        try{
+            OutilUtilities.articleJpa.create(this);
+            b=true;
+        }catch(Exception ex){
+            b=false;
+        }
+        return b;
+    }
+    
+    public List<Articles> listArticlesValide(){
+        
+        return OutilUtilities.articleJpa.listArticleValides();
+    }
+    
+    public boolean updateArticle(){
+        boolean b=false;
+        
+        try{
+            
+            OutilUtilities.articleJpa.edit(this);
+            b=true;
+        }catch(Exception ex){
+            b=false;
+        }
+        
+        return b;
+        
+    }
+    
+    
+    public Articles obtenirArticle(){
+        return OutilUtilities.articleJpa.findArticles(id);
+    }
+            
 }

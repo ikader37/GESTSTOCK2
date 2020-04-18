@@ -3,11 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/DELL/Documents/NetBeansProjects/GestStock/src/geststock/ecrans/dialog/DiaologSucess.java</file>
-            <file>file:/C:/Users/DELL/Documents/NetBeansProjects/GestStock/src/geststock/ecrans/Rangement.java</file>
-            <file>file:/C:/Users/DELL/Documents/NetBeansProjects/GestStock/src/geststock/ecrans/dialog/DialogFailed.java</file>
-            <file>file:/C:/Users/DELL/Documents/NetBeansProjects/GestStock/src/geststock/dialog/ConfirmDialogSup.java</file>
-            <file>file:/C:/Users/DELL/Documents/NetBeansProjects/GestStock/src/geststock/ecrans/Fournisseurs.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Rangement.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/ArticlesEcran.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Utilisateurs.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/CategorieEcran.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/utilities/OutilUtilities.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Fournisseurs.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/crud_methods/FournisseursJpaController.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/crud_methods/ArticlesJpaController.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/dialog/Reappro.java</file>
         </group>
     </open-files>
 </project-private>

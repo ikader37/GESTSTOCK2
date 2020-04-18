@@ -5,6 +5,7 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -202,4 +203,44 @@ public class Fournisseurs implements Serializable {
         return "geststock.classes.Fournisseurs[ id=" + id + " ]";
     }
     
+    
+    public List<Fournisseurs> listFournisseursValide(){
+        return OutilUtilities.fourniJpa.listFournisseursValide();
+    }
+    
+    public boolean createrFournisseurs(){
+        boolean b=false;
+        
+        try{
+            
+            OutilUtilities.fourniJpa.create(this);
+            b=true;
+        }catch(Exception ex){
+            b=false;
+        }
+        
+        
+        return b;
+    }
+    
+    
+    public boolean updateFournisseurs(){
+        boolean b=false;
+        
+        try{
+            
+            OutilUtilities.fourniJpa.edit(this);
+            b=true;
+        }catch(Exception ex){
+            b=false;
+        }
+        
+        
+        return b;
+    }
+    
+    public Fournisseurs obtenirFournisseurs(){
+        
+        return OutilUtilities.fourniJpa.findFournisseurs(id);
+    }
 }

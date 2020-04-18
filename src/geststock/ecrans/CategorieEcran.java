@@ -411,7 +411,7 @@ public class CategorieEcran extends javax.swing.JFrame {
             } else {
                 OutilUtilities.afficherMessageErreur("Enregistrement échoué!!\n Veuillez réessayer seulement.");
             }
-            categorie = new Categories();
+            
         } else if (operation == "mod") {
             boolean b = categorie.updateCategorie();
             if (b) {
@@ -420,6 +420,7 @@ public class CategorieEcran extends javax.swing.JFrame {
                 OutilUtilities.afficherMessageErreur("Mise à jour échouée!!\n Veuillez réessayer seulement.");
             }
         }
+        categorie = new Categories();
         
         remplirTableau(categorie.listCategorieValide());
 

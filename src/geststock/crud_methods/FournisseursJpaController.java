@@ -187,4 +187,9 @@ public class FournisseursJpaController implements Serializable {
         }
     }
     
+    
+    public List<Fournisseurs>  listFournisseursValide(){
+        
+        return this.emf.createEntityManager().createNamedQuery("Fournisseurs.findByDeleted").setParameter("deleted", false).getResultList();
+    }
 }

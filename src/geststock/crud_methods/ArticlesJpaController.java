@@ -274,4 +274,9 @@ public class ArticlesJpaController implements Serializable {
         }
     }
     
+    public List<Articles> listArticleValides(){
+        
+        return this.emf.createEntityManager().createNamedQuery("Articles.findByDeleted").setParameter("deleted", false).getResultList();
+    }
+    
 }

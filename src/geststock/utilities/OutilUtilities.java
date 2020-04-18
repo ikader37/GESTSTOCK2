@@ -6,7 +6,9 @@
 package geststock.utilities;
 
 import geststock.classes.Utilisateurs;
+import geststock.crud_methods.ArticlesJpaController;
 import geststock.crud_methods.CategoriesJpaController;
+import geststock.crud_methods.FournisseursJpaController;
 import geststock.crud_methods.RangementJpaController;
 import geststock.crud_methods.UtilisateursJpaController;
 import java.io.UnsupportedEncodingException;
@@ -27,13 +29,39 @@ import javax.swing.JOptionPane;
 public class OutilUtilities {
     
     public static JMenuBar menu=new JMenuBar();
-    public static Utilisateurs userActuel=new Utilisateurs();
+    public static Utilisateurs userActuel=new Utilisateurs(0);
     public static JFrame fenetreCourante=new JFrame();
     
     static EntityManagerFactory emf=Persistence.createEntityManagerFactory("GestStockPU");
     public static UtilisateursJpaController userJpa=new UtilisateursJpaController(emf);
     public static CategoriesJpaController categorieJpa=new CategoriesJpaController(emf);
     public static RangementJpaController rangJpa=new RangementJpaController(emf);
+    public static FournisseursJpaController fourniJpa=new FournisseursJpaController(emf);
+    
+    
+    public static ArticlesJpaController articleJpa=new ArticlesJpaController(emf);
+    
+    
+    /**
+     * 
+     * Les variables suivantes seront des messages a affiches 
+     */
+    public static String createdSucess="Enregistrement réussi!!. Merci!";
+    
+    public static String createError="Enregistrement échoué!!\n Veuillez réessayer svp. Merci!";
+    
+    public static String updateSuccess="Mise à jour réussi!!. Merci!";
+    
+    public static String updateError="Mise à jour échouée!!\n Veuillez réessayer svp. Merci!";
+    
+    public static String valNegative="Veuiller saissir des valeurs positives svp";
+    public static String annulerSupprimer="Opération de suppression annulée!!!";
+    public static String suppsuccess="Suppression réussi";
+    public static String supperror="Suppression échouée.\n Veuillez réessayer svp!!";
+    
+    public static String reapproSucess="Réapprovisionnement réussi!!";
+    public static String reapproError="Réapprovisionnement échoué .Veuillez réessayer svp.Merci!!";
+    
     
     
     public static void afficherMessage(String message){
@@ -67,5 +95,16 @@ public class OutilUtilities {
     }
     
     
+    /***
+     * Cette fonction permettra d'extraire le id des combobox
+     * @param str
+     * @return 
+     */
+    public static String trouverIdCombobox(String str){
+        
+        String [] ids=str.split("-");
+        return ids[0];
+        
+    }
     
 }

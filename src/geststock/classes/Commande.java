@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author DELL
+ * @author ilboudo
  */
 @Entity
 @Table(name = "commande")
@@ -34,8 +35,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Commande.findAll", query = "SELECT c FROM Commande c"),
     @NamedQuery(name = "Commande.findById", query = "SELECT c FROM Commande c WHERE c.id = :id"),
     @NamedQuery(name = "Commande.findByDateComan", query = "SELECT c FROM Commande c WHERE c.dateComan = :dateComan"),
-    @NamedQuery(name = "Commande.findByMontantTHt", query = "SELECT c FROM Commande c WHERE c.montantTHt = :montantTHt"),
-    @NamedQuery(name = "Commande.findByMontantTTtc", query = "SELECT c FROM Commande c WHERE c.montantTTtc = :montantTTtc"),
+    @NamedQuery(name = "Commande.findByMontantHt", query = "SELECT c FROM Commande c WHERE c.montantHt = :montantHt"),
+    @NamedQuery(name = "Commande.findByMontantTtc", query = "SELECT c FROM Commande c WHERE c.montantTtc = :montantTtc"),
     @NamedQuery(name = "Commande.findByIdclient", query = "SELECT c FROM Commande c WHERE c.idclient = :idclient"),
     @NamedQuery(name = "Commande.findByTva", query = "SELECT c FROM Commande c WHERE c.tva = :tva"),
     @NamedQuery(name = "Commande.findByCreatedAt", query = "SELECT c FROM Commande c WHERE c.createdAt = :createdAt"),
@@ -54,10 +55,10 @@ public class Commande implements Serializable {
     @Column(name = "date_coman")
     @Temporal(TemporalType.DATE)
     private Date dateComan;
-    @Column(name = "montant_t_ht")
-    private Integer montantTHt;
-    @Column(name = "montant_t_ttc")
-    private Integer montantTTtc;
+    @Column(name = "montant_ht")
+    private Integer montantHt;
+    @Column(name = "montant_ttc")
+    private Integer montantTtc;
     @Column(name = "idclient")
     private Integer idclient;
     @Column(name = "tva")
@@ -75,6 +76,8 @@ public class Commande implements Serializable {
     @Basic(optional = false)
     @Column(name = "deleted")
     private boolean deleted;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "commande")
+    private List<Articlecommande> articlecommandeList;
     @OneToMany(mappedBy = "idcommande")
     private List<Facture> factureList;
 
@@ -106,20 +109,20 @@ public class Commande implements Serializable {
         this.dateComan = dateComan;
     }
 
-    public Integer getMontantTHt() {
-        return montantTHt;
+    public Integer getMontantHt() {
+        return montantHt;
     }
 
-    public void setMontantTHt(Integer montantTHt) {
-        this.montantTHt = montantTHt;
+    public void setMontantHt(Integer montantHt) {
+        this.montantHt = montantHt;
     }
 
-    public Integer getMontantTTtc() {
-        return montantTTtc;
+    public Integer getMontantTtc() {
+        return montantTtc;
     }
 
-    public void setMontantTTtc(Integer montantTTtc) {
-        this.montantTTtc = montantTTtc;
+    public void setMontantTtc(Integer montantTtc) {
+        this.montantTtc = montantTtc;
     }
 
     public Integer getIdclient() {
@@ -179,6 +182,15 @@ public class Commande implements Serializable {
     }
 
     @XmlTransient
+    public List<Articlecommande> getArticlecommandeList() {
+        return articlecommandeList;
+    }
+
+    public void setArticlecommandeList(List<Articlecommande> articlecommandeList) {
+        this.articlecommandeList = articlecommandeList;
+    }
+
+    @XmlTransient
     public List<Facture> getFactureList() {
         return factureList;
     }
@@ -206,7 +218,7 @@ public class Commande implements Serializable {
         }
         return true;
     }
-
+    
     @Override
     public String toString() {
         return "geststock.classes.Commande[ id=" + id + " ]";
