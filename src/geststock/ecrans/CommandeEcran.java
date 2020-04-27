@@ -7,6 +7,7 @@ package geststock.ecrans;
 
 import geststock.classes.Articlecommande;
 import geststock.classes.Articles;
+import geststock.dialog.FactureDialog;
 import geststock.utilities.OutilUtilities;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,48 +20,75 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CommandeEcran extends javax.swing.JFrame {
 
+    private DefaultComboBoxModel modelProduit = new DefaultComboBoxModel();
+    private DefaultTableModel modelTable = new DefaultTableModel();
+
+    private Articles article = new Articles();
+    private Articles selectedArticle=new Articles();
+    private int selectedRow=0;
     
-    private DefaultComboBoxModel modelProduit=new DefaultComboBoxModel();
-    private DefaultTableModel modelTable=new DefaultTableModel();
-    
-    private Articles article=new Articles();
-    private List<Articlecommande> articleCommandeList=new ArrayList<>();
-    
-    
-    
-    
-    
-    public void remplirListArticle(List<Articles> articles){
+    private List<Articlecommande> articleCommandeList = new ArrayList<>();
+
+    public void remplirListArticle(List<Articles> articles) {
         modelProduit.removeAllElements();
         for (Articles ar : articles) {
-            modelProduit.addElement(ar.getId() + "-" + ar.getReference()+ " " + ar.getDesignation());
+            modelProduit.addElement(ar.getId() + "-" + ar.getReference() + " " + ar.getDesignation());
         }
     }
-    
-    
-    
-    public void changeChampValue(Articles article){
-        txt_pv.setText(article.getPrixVente()+" F CFA");
-        txt_q_actuel.setText(article.getQuantite()+"");
-        
+
+    public void remplirTableauCommande(List<Articlecommande> articleCommande) {
+
+        int nombrepresent = modelTable.getRowCount();
+        //Verifier quil ny a rien dedans
+        int i = nombrepresent;
+        if (nombrepresent > 0) {
+            i--;
+            while (i >= 0) {
+                //Retirer les elemets du tableau
+                modelTable.removeRow(i);
+                i--;
+            }
+        }
+
+        /**
+         * Verifier que la liste passee en parametre n'est pas nulle
+         */
+        if (articleCommande != null) {
+            i = 1;
+            for (Articlecommande ar : articleCommande) {
+                modelTable.addRow(new String[]{i + "", ar.getArticles().getId() + "", ar.getArticles().getReference(), ar.getArticles().getDesignation(), ar.getArticles().getPrixVente()+" F CFA",ar.getQuantite()+"",ar.getPrixht()+" F CFA",ar.getPrixttc()+" F CFA"});
+            }
+
+        }
     }
+
+    public void changeChampValue(Articles article) {
+        txt_pv.setText(article.getPrixVente() + " F CFA");
+        txt_q_actuel.setText(article.getQuantite() + "");
+
+    }
+
     /**
      * Creates new form CommandeEcran
      */
     public CommandeEcran() {
         initComponents();
-        
+
         remplirListArticle(article.listArticlesValide());
         spin_quantite.setValue(1);
         txt_q_invalide.setVisible(false);
-        
+
         modelTable.addColumn("#");
+         modelTable.addColumn("Id");
         modelTable.addColumn("Référence");
         modelTable.addColumn("Désignation");
         modelTable.addColumn("Prix de vente");
         modelTable.addColumn("Quantité");
         modelTable.addColumn("Montant HT");
         modelTable.addColumn("Montant TTC");
+        txt_totauxttc.setText("0 F CFA");
+        txt_totauxht.setText("0 F CFA");
+        remplirTableauCommande(articleCommandeList);
     }
 
     /**
@@ -96,23 +124,30 @@ public class CommandeEcran extends javax.swing.JFrame {
         jPanel8 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        txt_totauxht = new javax.swing.JLabel();
+        txt_totauxttc = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Ventes");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1166, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGap(0, 70, Short.MAX_VALUE)
         );
 
         btn_add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Pluspx.png"))); // NOI18N
@@ -144,6 +179,9 @@ public class CommandeEcran extends javax.swing.JFrame {
         jLabel4.setText("Prix de vente:");
 
         jLabel5.setText("Quantité:");
+
+        txt_pv.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        txt_pv.setForeground(new java.awt.Color(255, 0, 66));
 
         spin_quantite.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -273,7 +311,6 @@ public class CommandeEcran extends javax.swing.JFrame {
                             .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addComponent(spin_quantite)
                                 .addGap(8, 8, 8)))
-                        .addGap(18, 18, 18)
                         .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(txt_q_invalide, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -317,45 +354,76 @@ public class CommandeEcran extends javax.swing.JFrame {
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jTable1.setModel(modelTable);
-        jScrollPane1.setViewportView(jTable1);
+        table.setModel(modelTable);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(table);
+
+        jLabel7.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel7.setText("TOTAUX  HT:");
+
+        jLabel8.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel8.setText("MONTANT TTC:");
+
+        txt_totauxht.setBackground(new java.awt.Color(245, 247, 245));
+        txt_totauxht.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        txt_totauxht.setForeground(new java.awt.Color(255, 0, 0));
+
+        txt_totauxttc.setBackground(new java.awt.Color(245, 247, 245));
+        txt_totauxttc.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        txt_totauxttc.setForeground(new java.awt.Color(255, 0, 0));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txt_totauxht, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txt_totauxttc, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_totauxht, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                    .addComponent(txt_totauxttc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 47, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 879, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-        );
-
-        jButton1.setText("Nouvelle commande");
-
-        jButton2.setText("Valider la commande");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(183, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
-            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -366,7 +434,59 @@ public class CommandeEcran extends javax.swing.JFrame {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 75, Short.MAX_VALUE)
+        );
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Pluspx.png"))); // NOI18N
+        jButton1.setText("Nouvelle commande");
+
+        jButton2.setBackground(new java.awt.Color(0, 255, 54));
+        jButton2.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(255, 0, 0));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Okpx.png"))); // NOI18N
+        jButton2.setText("Valider la vente");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setBackground(new java.awt.Color(255, 166, 0));
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Deletepx.png"))); // NOI18N
+        jButton3.setText("Rétirer de la vente");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(89, 89, 89)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -378,11 +498,13 @@ public class CommandeEcran extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(738, 738, 738)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -390,16 +512,14 @@ public class CommandeEcran extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 81, Short.MAX_VALUE)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -408,40 +528,125 @@ public class CommandeEcran extends javax.swing.JFrame {
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
         // TODO add your handling code here:
+
+        Articlecommande artcomde = new Articlecommande();
         
-        Articlecommande artcomde=new Articlecommande();
         artcomde.setArticles(article);
-        articleCommandeList.add(artcomde);
+        artcomde.setQuantite(Integer.parseInt(spin_quantite.getValue().toString()));
+        artcomde.setPrixht(Integer.parseInt(txt_montant_ht.getText().toString()));
         
+        double mttc=Double.parseDouble(txt__montant_ttc.getText().toString());
+        
+        artcomde.setPrixttc(mttc);
+        
+        articleCommandeList.add(artcomde);
+        remplirTableauCommande(articleCommandeList);
+        if(articleCommandeList.size()>0){
+            double tht=0;
+            double tttc=0;
+            for(Articlecommande a:articleCommandeList){
+                tht=a.getPrixht()+tht;
+                tttc=tttc+a.getPrixttc();
+            }
+            txt_totauxht.setText(tht+" F CFA");
+            txt_totauxttc.setText(tttc+" F CFA");
+            
+        }
+        artcomde = new Articlecommande();
+        //article=new Articles();
+         String item = cb_articles.getSelectedItem().toString();
+        int idart = Integer.parseInt(OutilUtilities.trouverIdCombobox(item));
+        article.setId(idart);
+        article = article.obtenirArticle();
+        changeChampValue(article);
     }//GEN-LAST:event_btn_addActionPerformed
 
     private void cb_articlesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cb_articlesItemStateChanged
         // TODO add your handling code here:
-        
-        String item=cb_articles.getSelectedItem().toString();
-        int idart=Integer.parseInt(OutilUtilities.trouverIdCombobox(item));
+
+        String item = cb_articles.getSelectedItem().toString();
+        int idart = Integer.parseInt(OutilUtilities.trouverIdCombobox(item));
         article.setId(idart);
-        article=article.obtenirArticle();
+        article = article.obtenirArticle();
         changeChampValue(article);
     }//GEN-LAST:event_cb_articlesItemStateChanged
 
     private void spin_quantiteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spin_quantiteStateChanged
         // TODO add your handling code here:
+
+        int quantite = Integer.parseInt(spin_quantite.getValue().toString());
         
-        int quantite=Integer.parseInt(spin_quantite.getValue().toString());
-        
-        if(quantite>article.getQuantite() || quantite<=0){
+        System.out.println("QUANTITE :"+quantite);
+
+        if (quantite > article.getQuantite() || quantite <= 0) {
             btn_add.setEnabled(false);
             txt_montant_ht.setText("");
             txt__montant_ttc.setText("");
             txt_q_invalide.setVisible(true);
-        }else{
+        } else {
             btn_add.setEnabled(true);
-            txt_montant_ht.setText(article.getPrixVente()*quantite +"");
-            txt__montant_ttc.setText((article.getPrixVente()*quantite +(0.18*article.getPrixVente()*quantite))+"");
+            txt_montant_ht.setText(article.getPrixVente() * quantite + "");
+            txt__montant_ttc.setText((article.getPrixVente() * quantite + (0.18 * article.getPrixVente() * quantite)) + "");
             txt_q_invalide.setVisible(false);
         }
     }//GEN-LAST:event_spin_quantiteStateChanged
+
+    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+        // TODO add your handling code here:
+        
+        int ligne=table.getSelectedRow();
+        int idart=Integer.parseInt(table.getValueAt(ligne, 1).toString());
+        selectedArticle.setId(idart);
+        
+        
+    }//GEN-LAST:event_tableMouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        
+        //Verifions si une ligne a ete selectionnee dans le tableau
+        int ligne=table.getSelectedRow();
+        
+        System.out.println("LIGNE SELECTIONNEE :"+ligne);
+        if(ligne<0){
+            ligne=0;
+        }
+        int idart=Integer.parseInt(table.getValueAt(ligne, 1).toString());
+        
+        for(int i=0;i<articleCommandeList.size();i++){
+            
+            Articlecommande ar=articleCommandeList.get(i);
+            if(ar.getArticles().getId()==idart){
+                articleCommandeList.remove(i);
+                break;
+            }
+        }
+        modelTable.removeRow(ligne);
+        
+        if(articleCommandeList.size()>0){
+            double tht=0;
+            double tttc=0;
+            for(Articlecommande a:articleCommandeList){
+                tht=a.getPrixht()+tht;
+                tttc=tttc+a.getPrixttc();
+            }
+            txt_totauxht.setText(tht+" F CFA");
+            txt_totauxttc.setText(tttc+" F CFA");
+            
+        }else{
+            txt_totauxht.setText("0 F CFA");
+            txt_totauxttc.setText("0 F CFA");
+        }
+        //table.remove(ligne);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        
+        FactureDialog fact=new FactureDialog(this, true,articleCommandeList);
+        //fact.setArticleCommandeList(articleCommandeList);
+        fact.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -483,6 +688,7 @@ public class CommandeEcran extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cb_articles;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -490,8 +696,11 @@ public class CommandeEcran extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -501,12 +710,14 @@ public class CommandeEcran extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JSpinner spin_quantite;
+    private javax.swing.JTable table;
     private javax.swing.JLabel txt__montant_ttc;
     private javax.swing.JLabel txt_montant_ht;
     private javax.swing.JLabel txt_pv;
     private javax.swing.JLabel txt_q_actuel;
     private javax.swing.JLabel txt_q_invalide;
+    private javax.swing.JLabel txt_totauxht;
+    private javax.swing.JLabel txt_totauxttc;
     // End of variables declaration//GEN-END:variables
 }

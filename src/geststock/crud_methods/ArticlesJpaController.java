@@ -5,6 +5,7 @@
  */
 package geststock.crud_methods;
 
+import geststock.classes.Articlecommande;
 import geststock.classes.Articles;
 import java.io.Serializable;
 import javax.persistence.Query;
@@ -15,6 +16,7 @@ import geststock.classes.Categories;
 import geststock.classes.Fournisseurs;
 import geststock.classes.Rangement;
 import geststock.classes.Vendres;
+import geststock.crud_methods.exceptions.IllegalOrphanException;
 import geststock.crud_methods.exceptions.NonexistentEntityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,9 @@ public class ArticlesJpaController implements Serializable {
     public void create(Articles articles) {
         if (articles.getVendresList() == null) {
             articles.setVendresList(new ArrayList<Vendres>());
+        }
+        if (articles.getArticlecommandeList() == null) {
+            articles.setArticlecommandeList(new ArrayList<Articlecommande>());
         }
         EntityManager em = null;
         try {
@@ -65,6 +70,12 @@ public class ArticlesJpaController implements Serializable {
                 attachedVendresList.add(vendresListVendresToAttach);
             }
             articles.setVendresList(attachedVendresList);
+            List<Articlecommande> attachedArticlecommandeList = new ArrayList<Articlecommande>();
+            for (Articlecommande articlecommandeListArticlecommandeToAttach : articles.getArticlecommandeList()) {
+                articlecommandeListArticlecommandeToAttach = em.getReference(articlecommandeListArticlecommandeToAttach.getClass(), articlecommandeListArticlecommandeToAttach.getArticlecommandePK());
+                attachedArticlecommandeList.add(articlecommandeListArticlecommandeToAttach);
+            }
+            articles.setArticlecommandeList(attachedArticlecommandeList);
             em.persist(articles);
             if (categorieId != null) {
                 categorieId.getArticlesList().add(articles);
@@ -87,6 +98,15 @@ public class ArticlesJpaController implements Serializable {
                     oldArticleIdOfVendresListVendres = em.merge(oldArticleIdOfVendresListVendres);
                 }
             }
+            for (Articlecommande articlecommandeListArticlecommande : articles.getArticlecommandeList()) {
+                Articles oldArticlesOfArticlecommandeListArticlecommande = articlecommandeListArticlecommande.getArticles();
+                articlecommandeListArticlecommande.setArticles(articles);
+                articlecommandeListArticlecommande = em.merge(articlecommandeListArticlecommande);
+                if (oldArticlesOfArticlecommandeListArticlecommande != null) {
+                    oldArticlesOfArticlecommandeListArticlecommande.getArticlecommandeList().remove(articlecommandeListArticlecommande);
+                    oldArticlesOfArticlecommandeListArticlecommande = em.merge(oldArticlesOfArticlecommandeListArticlecommande);
+                }
+            }
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -95,7 +115,7 @@ public class ArticlesJpaController implements Serializable {
         }
     }
 
-    public void edit(Articles articles) throws NonexistentEntityException, Exception {
+    public void edit(Articles articles) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -109,6 +129,20 @@ public class ArticlesJpaController implements Serializable {
             Rangement idrangemenntNew = articles.getIdrangemennt();
             List<Vendres> vendresListOld = persistentArticles.getVendresList();
             List<Vendres> vendresListNew = articles.getVendresList();
+            List<Articlecommande> articlecommandeListOld = persistentArticles.getArticlecommandeList();
+            List<Articlecommande> articlecommandeListNew = articles.getArticlecommandeList();
+            List<String> illegalOrphanMessages = null;
+            for (Articlecommande articlecommandeListOldArticlecommande : articlecommandeListOld) {
+                if (!articlecommandeListNew.contains(articlecommandeListOldArticlecommande)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Articlecommande " + articlecommandeListOldArticlecommande + " since its articles field is not nullable.");
+                }
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
+            }
             if (categorieIdNew != null) {
                 categorieIdNew = em.getReference(categorieIdNew.getClass(), categorieIdNew.getId());
                 articles.setCategorieId(categorieIdNew);
@@ -128,6 +162,13 @@ public class ArticlesJpaController implements Serializable {
             }
             vendresListNew = attachedVendresListNew;
             articles.setVendresList(vendresListNew);
+            List<Articlecommande> attachedArticlecommandeListNew = new ArrayList<Articlecommande>();
+            for (Articlecommande articlecommandeListNewArticlecommandeToAttach : articlecommandeListNew) {
+                articlecommandeListNewArticlecommandeToAttach = em.getReference(articlecommandeListNewArticlecommandeToAttach.getClass(), articlecommandeListNewArticlecommandeToAttach.getArticlecommandePK());
+                attachedArticlecommandeListNew.add(articlecommandeListNewArticlecommandeToAttach);
+            }
+            articlecommandeListNew = attachedArticlecommandeListNew;
+            articles.setArticlecommandeList(articlecommandeListNew);
             articles = em.merge(articles);
             if (categorieIdOld != null && !categorieIdOld.equals(categorieIdNew)) {
                 categorieIdOld.getArticlesList().remove(articles);
@@ -170,6 +211,17 @@ public class ArticlesJpaController implements Serializable {
                     }
                 }
             }
+            for (Articlecommande articlecommandeListNewArticlecommande : articlecommandeListNew) {
+                if (!articlecommandeListOld.contains(articlecommandeListNewArticlecommande)) {
+                    Articles oldArticlesOfArticlecommandeListNewArticlecommande = articlecommandeListNewArticlecommande.getArticles();
+                    articlecommandeListNewArticlecommande.setArticles(articles);
+                    articlecommandeListNewArticlecommande = em.merge(articlecommandeListNewArticlecommande);
+                    if (oldArticlesOfArticlecommandeListNewArticlecommande != null && !oldArticlesOfArticlecommandeListNewArticlecommande.equals(articles)) {
+                        oldArticlesOfArticlecommandeListNewArticlecommande.getArticlecommandeList().remove(articlecommandeListNewArticlecommande);
+                        oldArticlesOfArticlecommandeListNewArticlecommande = em.merge(oldArticlesOfArticlecommandeListNewArticlecommande);
+                    }
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -187,7 +239,7 @@ public class ArticlesJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -198,6 +250,17 @@ public class ArticlesJpaController implements Serializable {
                 articles.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The articles with id " + id + " no longer exists.", enfe);
+            }
+            List<String> illegalOrphanMessages = null;
+            List<Articlecommande> articlecommandeListOrphanCheck = articles.getArticlecommandeList();
+            for (Articlecommande articlecommandeListOrphanCheckArticlecommande : articlecommandeListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Articles (" + articles + ") cannot be destroyed since the Articlecommande " + articlecommandeListOrphanCheckArticlecommande + " in its articlecommandeList field has a non-nullable articles field.");
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
             }
             Categories categorieId = articles.getCategorieId();
             if (categorieId != null) {

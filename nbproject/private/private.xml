@@ -3,15 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Rangement.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/ArticlesEcran.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Utilisateurs.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/CategorieEcran.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/utilities/OutilUtilities.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Fournisseurs.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/crud_methods/FournisseursJpaController.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/crud_methods/ArticlesJpaController.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/dialog/Reappro.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/ListDesCommandesPresents.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/crud_methods/CommandeJpaController.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/CommandeEcran.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Commande.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/dialog/FactureDialog.java</file>
+            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/Impressions/FactureTTC.jrxml</file>
         </group>
     </open-files>
 </project-private>

@@ -5,8 +5,10 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,10 +17,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -61,6 +65,8 @@ public class Client implements Serializable {
     private Integer createdBy;
     @Column(name = "updated_by")
     private Integer updatedBy;
+     @OneToMany(mappedBy = "idclient")
+    private List<Commande> commandeList;
 
     public Client() {
     }
@@ -132,6 +138,18 @@ public class Client implements Serializable {
     public void setUpdatedBy(Integer updatedBy) {
         this.updatedBy = updatedBy;
     }
+    
+    @XmlTransient
+    public List<Commande> getCommandeList() {
+        return commandeList;
+    }
+
+    public void setCommandeList(List<Commande> commandeList) {
+        this.commandeList = commandeList;
+    }
+    
+    
+    
 
     @Override
     public int hashCode() {
@@ -156,6 +174,17 @@ public class Client implements Serializable {
     @Override
     public String toString() {
         return "geststock.classes.Client[ idclient=" + idclient + " ]";
+    }
+    
+    public Client ajouterClient(){
+        
+        try{
+            
+            OutilUtilities.clientJpa.create(this);
+            return this;
+        }catch(Exception ex){
+            return null;
+        }
     }
     
 }

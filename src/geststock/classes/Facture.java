@@ -5,8 +5,10 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -56,12 +58,15 @@ public class Facture implements Serializable {
     private Date dateFact;
     @Column(name = "versement")
     private Integer versement;
+     @Column(name = "valeur_facture")
+    private Double valeur_facture;
+    
     @Column(name = "reste_payer")
     private Integer restePayer;
     @Column(name = "montant_ht")
-    private Integer montantHt;
+    private double montantHt;
     @Column(name = "montant_ttc")
-    private Integer montantTtc;
+    private double montantTtc;
     @Column(name = "mode_payement")
     private String modePayement;
     @Column(name = "deleted")
@@ -119,19 +124,27 @@ public class Facture implements Serializable {
         this.restePayer = restePayer;
     }
 
-    public Integer getMontantHt() {
+    public Double getValeur_facture() {
+        return valeur_facture;
+    }
+
+    public void setValeur_facture(Double valeur_facture) {
+        this.valeur_facture = valeur_facture;
+    }
+
+    public double getMontantHt() {
         return montantHt;
     }
 
-    public void setMontantHt(Integer montantHt) {
+    public void setMontantHt(double montantHt) {
         this.montantHt = montantHt;
     }
 
-    public Integer getMontantTtc() {
+    public double getMontantTtc() {
         return montantTtc;
     }
 
-    public void setMontantTtc(Integer montantTtc) {
+    public void setMontantTtc(double montantTtc) {
         this.montantTtc = montantTtc;
     }
 
@@ -214,6 +227,25 @@ public class Facture implements Serializable {
     @Override
     public String toString() {
         return "geststock.classes.Facture[ id=" + id + " ]";
+    }
+    
+    
+    public Facture ajouerFacture(){
+        
+        try{
+            OutilUtilities.factJpa.create(this);
+            return this;
+        }catch(Exception ex){
+            return null;
+        }
+    }
+    
+    public List<Facture> listFactureValide(){
+        return OutilUtilities.factJpa.listFactureValide();
+    }
+    
+    public List<Facture> listFactureDeleted(){
+        return OutilUtilities.factJpa.listFactureDeleted();
     }
     
 }

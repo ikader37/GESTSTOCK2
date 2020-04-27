@@ -5,6 +5,7 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -50,7 +51,9 @@ public class Articlecommande implements Serializable {
     @Column(name = "prixht")
     private Integer prixht;
     @Column(name = "prixttc")
-    private Integer prixttc;
+    private Double prixttc;
+    @Column(name = "prix_vente")
+    private Double prix_vente;
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
     private Date createdAt;
@@ -111,11 +114,11 @@ public class Articlecommande implements Serializable {
         this.prixht = prixht;
     }
 
-    public Integer getPrixttc() {
+    public Double getPrixttc() {
         return prixttc;
     }
 
-    public void setPrixttc(Integer prixttc) {
+    public void setPrixttc(Double prixttc) {
         this.prixttc = prixttc;
     }
 
@@ -167,6 +170,17 @@ public class Articlecommande implements Serializable {
         this.articles = articles;
     }
 
+    public Double getPrix_vente() {
+        return prix_vente;
+    }
+
+    public void setPrix_vente(Double prix_vente) {
+        this.prix_vente = prix_vente;
+    }
+
+    
+    
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -192,4 +206,14 @@ public class Articlecommande implements Serializable {
         return "javaapplication1.vvv.Articlecommande[ articlecommandePK=" + articlecommandePK + " ]";
     }
     
+    
+    public Articlecommande ajouterArticleCommande(){
+        try{
+            OutilUtilities.articlecommandeJpa.create(this);
+            return this;
+        }catch(Exception ex){
+            System.out.println("Except:ARTCOMMANDE:"+ex.getMessage());
+            return null;
+        }
+    }
 }

@@ -5,6 +5,7 @@
  */
 package geststock.classes;
 
+import geststock.utilities.OutilUtilities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -56,13 +59,17 @@ public class Commande implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dateComan;
     @Column(name = "montant_ht")
-    private Integer montantHt;
+    private double montantHt;
     @Column(name = "montant_ttc")
-    private Integer montantTtc;
-    @Column(name = "idclient")
-    private Integer idclient;
+    private Double montantTtc;
+    //@Column(name = "idclient")
+    @JoinColumn(name = "idclient", referencedColumnName = "idclient")
+    @ManyToOne
+    private Client idclient;
     @Column(name = "tva")
     private Boolean tva;
+    @Column(name = "valider")
+    private Boolean valider;
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
     private Date createdAt;
@@ -109,27 +116,27 @@ public class Commande implements Serializable {
         this.dateComan = dateComan;
     }
 
-    public Integer getMontantHt() {
+    public double getMontantHt() {
         return montantHt;
     }
 
-    public void setMontantHt(Integer montantHt) {
+    public void setMontantHt(double montantHt) {
         this.montantHt = montantHt;
     }
 
-    public Integer getMontantTtc() {
+    public Double getMontantTtc() {
         return montantTtc;
     }
 
-    public void setMontantTtc(Integer montantTtc) {
+    public void setMontantTtc(Double montantTtc) {
         this.montantTtc = montantTtc;
     }
 
-    public Integer getIdclient() {
+    public Client getIdclient() {
         return idclient;
     }
 
-    public void setIdclient(Integer idclient) {
+    public void setIdclient(Client idclient) {
         this.idclient = idclient;
     }
 
@@ -181,6 +188,15 @@ public class Commande implements Serializable {
         this.deleted = deleted;
     }
 
+    public Boolean getValider() {
+        return valider;
+    }
+
+    public void setValider(Boolean valider) {
+        this.valider = valider;
+    }
+
+    
     @XmlTransient
     public List<Articlecommande> getArticlecommandeList() {
         return articlecommandeList;
@@ -224,4 +240,27 @@ public class Commande implements Serializable {
         return "geststock.classes.Commande[ id=" + id + " ]";
     }
     
+    
+    public boolean ajouterCommande(){
+        boolean b=false;
+        try{
+            OutilUtilities.commandeJpa.create(this);
+            b=true;
+        }catch(Exception ex){
+            System.out.println(ex.getMessage());
+            b=false;
+        }
+        return b;
+    }
+    
+    
+    public List<Commande> listCommandeValide(){
+        
+        return OutilUtilities.commandeJpa.commandeValides();
+    }
+    
+    
+    public List<Commande> listCommandeDeleted(){
+        return OutilUtilities.commandeJpa.commandeDeleted();
+    }
 }

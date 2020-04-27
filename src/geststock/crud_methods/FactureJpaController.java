@@ -165,4 +165,15 @@ public class FactureJpaController implements Serializable {
         }
     }
     
+    
+    public List<Facture> listFactureValide(){
+        
+        return emf.createEntityManager().createNamedQuery("Facture.findByDeleted").setParameter("deleted", false).getResultList();
+    }
+    
+    public List<Facture> listFactureDeleted(){
+        return emf.createEntityManager().createNamedQuery("Facture.findByDeleted").setParameter("deleted", true).getResultList();
+  
+        
+    }
 }

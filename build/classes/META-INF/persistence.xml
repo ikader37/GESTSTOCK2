@@ -15,6 +15,8 @@
     <class>geststock.classes.Employes</class>
     <class>geststock.classes.Roles</class>
     <class>geststock.classes.Entreprise</class>
+    <class>geststock.classes.Articlecommande</class>
+  
     <class>geststock.classes.Articles</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/geststock?zeroDateTimeBehavior=convertToNull"/>

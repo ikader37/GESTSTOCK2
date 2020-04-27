@@ -5,15 +5,23 @@
  */
 package geststock.utilities;
 
+import com.mysql.jdbc.Connection;
 import geststock.classes.Utilisateurs;
+import geststock.crud_methods.ArticlecommandeJpaController;
 import geststock.crud_methods.ArticlesJpaController;
 import geststock.crud_methods.CategoriesJpaController;
+import geststock.crud_methods.ClientJpaController;
+import geststock.crud_methods.CommandeJpaController;
+import geststock.crud_methods.FactureJpaController;
 import geststock.crud_methods.FournisseursJpaController;
 import geststock.crud_methods.RangementJpaController;
 import geststock.crud_methods.UtilisateursJpaController;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
@@ -21,6 +29,15 @@ import javax.persistence.Persistence;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JRDesignQuery;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -37,6 +54,11 @@ public class OutilUtilities {
     public static CategoriesJpaController categorieJpa=new CategoriesJpaController(emf);
     public static RangementJpaController rangJpa=new RangementJpaController(emf);
     public static FournisseursJpaController fourniJpa=new FournisseursJpaController(emf);
+    public static CommandeJpaController commandeJpa=new CommandeJpaController(emf);
+    public static FactureJpaController factJpa=new FactureJpaController(emf);
+    public static ArticlecommandeJpaController articlecommandeJpa=new ArticlecommandeJpaController(emf);
+    public static ClientJpaController clientJpa=new ClientJpaController(emf);
+    
     
     
     public static ArticlesJpaController articleJpa=new ArticlesJpaController(emf);
@@ -105,6 +127,31 @@ public class OutilUtilities {
         String [] ids=str.split("-");
         return ids[0];
         
+    }
+    
+    
+    public static void afficherReport(String report,String sql,HashMap<String,Object> parameters){
+        try {
+            JasperDesign jd=JRXmlLoader.load(report);
+            
+            JRDesignQuery newQ=new JRDesignQuery();
+            newQ.setText(sql);
+            jd.setQuery(newQ);
+            
+            JasperReport jr=JasperCompileManager.compileReport(jd);
+            JasperPrint jp=JasperFillManager.fillReport(jr, parameters,SingletonConnection.getConnecter());
+            
+            JasperViewer.viewReport(jp,false);
+        
+        } catch (JRException ex) {
+            Logger.getLogger(OutilUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public static void main(String[] args){
+        File f=new File("../../Impressions/FactureTTC.jrxml");
+        System.out.println(f.exists());
     }
     
 }

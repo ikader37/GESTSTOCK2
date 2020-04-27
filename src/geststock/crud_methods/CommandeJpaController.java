@@ -5,6 +5,7 @@
  */
 package geststock.crud_methods;
 
+import geststock.classes.Articlecommande;
 import geststock.classes.Commande;
 import java.io.Serializable;
 import javax.persistence.Query;
@@ -12,6 +13,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import geststock.classes.Facture;
+import geststock.crud_methods.exceptions.IllegalOrphanException;
 import geststock.crud_methods.exceptions.NonexistentEntityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,9 @@ public class CommandeJpaController implements Serializable {
     }
 
     public void create(Commande commande) {
+        if (commande.getArticlecommandeList() == null) {
+            commande.setArticlecommandeList(new ArrayList<Articlecommande>());
+        }
         if (commande.getFactureList() == null) {
             commande.setFactureList(new ArrayList<Facture>());
         }
@@ -41,6 +46,12 @@ public class CommandeJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            List<Articlecommande> attachedArticlecommandeList = new ArrayList<Articlecommande>();
+            for (Articlecommande articlecommandeListArticlecommandeToAttach : commande.getArticlecommandeList()) {
+                articlecommandeListArticlecommandeToAttach = em.getReference(articlecommandeListArticlecommandeToAttach.getClass(), articlecommandeListArticlecommandeToAttach.getArticlecommandePK());
+                attachedArticlecommandeList.add(articlecommandeListArticlecommandeToAttach);
+            }
+            commande.setArticlecommandeList(attachedArticlecommandeList);
             List<Facture> attachedFactureList = new ArrayList<Facture>();
             for (Facture factureListFactureToAttach : commande.getFactureList()) {
                 factureListFactureToAttach = em.getReference(factureListFactureToAttach.getClass(), factureListFactureToAttach.getId());
@@ -48,6 +59,15 @@ public class CommandeJpaController implements Serializable {
             }
             commande.setFactureList(attachedFactureList);
             em.persist(commande);
+            for (Articlecommande articlecommandeListArticlecommande : commande.getArticlecommandeList()) {
+                Commande oldCommandeOfArticlecommandeListArticlecommande = articlecommandeListArticlecommande.getCommande();
+                articlecommandeListArticlecommande.setCommande(commande);
+                articlecommandeListArticlecommande = em.merge(articlecommandeListArticlecommande);
+                if (oldCommandeOfArticlecommandeListArticlecommande != null) {
+                    oldCommandeOfArticlecommandeListArticlecommande.getArticlecommandeList().remove(articlecommandeListArticlecommande);
+                    oldCommandeOfArticlecommandeListArticlecommande = em.merge(oldCommandeOfArticlecommandeListArticlecommande);
+                }
+            }
             for (Facture factureListFacture : commande.getFactureList()) {
                 Commande oldIdcommandeOfFactureListFacture = factureListFacture.getIdcommande();
                 factureListFacture.setIdcommande(commande);
@@ -65,14 +85,35 @@ public class CommandeJpaController implements Serializable {
         }
     }
 
-    public void edit(Commande commande) throws NonexistentEntityException, Exception {
+    public void edit(Commande commande) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
             Commande persistentCommande = em.find(Commande.class, commande.getId());
+            List<Articlecommande> articlecommandeListOld = persistentCommande.getArticlecommandeList();
+            List<Articlecommande> articlecommandeListNew = commande.getArticlecommandeList();
             List<Facture> factureListOld = persistentCommande.getFactureList();
             List<Facture> factureListNew = commande.getFactureList();
+            List<String> illegalOrphanMessages = null;
+            for (Articlecommande articlecommandeListOldArticlecommande : articlecommandeListOld) {
+                if (!articlecommandeListNew.contains(articlecommandeListOldArticlecommande)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Articlecommande " + articlecommandeListOldArticlecommande + " since its commande field is not nullable.");
+                }
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
+            }
+            List<Articlecommande> attachedArticlecommandeListNew = new ArrayList<Articlecommande>();
+            for (Articlecommande articlecommandeListNewArticlecommandeToAttach : articlecommandeListNew) {
+                articlecommandeListNewArticlecommandeToAttach = em.getReference(articlecommandeListNewArticlecommandeToAttach.getClass(), articlecommandeListNewArticlecommandeToAttach.getArticlecommandePK());
+                attachedArticlecommandeListNew.add(articlecommandeListNewArticlecommandeToAttach);
+            }
+            articlecommandeListNew = attachedArticlecommandeListNew;
+            commande.setArticlecommandeList(articlecommandeListNew);
             List<Facture> attachedFactureListNew = new ArrayList<Facture>();
             for (Facture factureListNewFactureToAttach : factureListNew) {
                 factureListNewFactureToAttach = em.getReference(factureListNewFactureToAttach.getClass(), factureListNewFactureToAttach.getId());
@@ -81,6 +122,17 @@ public class CommandeJpaController implements Serializable {
             factureListNew = attachedFactureListNew;
             commande.setFactureList(factureListNew);
             commande = em.merge(commande);
+            for (Articlecommande articlecommandeListNewArticlecommande : articlecommandeListNew) {
+                if (!articlecommandeListOld.contains(articlecommandeListNewArticlecommande)) {
+                    Commande oldCommandeOfArticlecommandeListNewArticlecommande = articlecommandeListNewArticlecommande.getCommande();
+                    articlecommandeListNewArticlecommande.setCommande(commande);
+                    articlecommandeListNewArticlecommande = em.merge(articlecommandeListNewArticlecommande);
+                    if (oldCommandeOfArticlecommandeListNewArticlecommande != null && !oldCommandeOfArticlecommandeListNewArticlecommande.equals(commande)) {
+                        oldCommandeOfArticlecommandeListNewArticlecommande.getArticlecommandeList().remove(articlecommandeListNewArticlecommande);
+                        oldCommandeOfArticlecommandeListNewArticlecommande = em.merge(oldCommandeOfArticlecommandeListNewArticlecommande);
+                    }
+                }
+            }
             for (Facture factureListOldFacture : factureListOld) {
                 if (!factureListNew.contains(factureListOldFacture)) {
                     factureListOldFacture.setIdcommande(null);
@@ -115,7 +167,7 @@ public class CommandeJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -126,6 +178,17 @@ public class CommandeJpaController implements Serializable {
                 commande.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The commande with id " + id + " no longer exists.", enfe);
+            }
+            List<String> illegalOrphanMessages = null;
+            List<Articlecommande> articlecommandeListOrphanCheck = commande.getArticlecommandeList();
+            for (Articlecommande articlecommandeListOrphanCheckArticlecommande : articlecommandeListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Commande (" + commande + ") cannot be destroyed since the Articlecommande " + articlecommandeListOrphanCheckArticlecommande + " in its articlecommandeList field has a non-nullable commande field.");
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
             }
             List<Facture> factureList = commande.getFactureList();
             for (Facture factureListFacture : factureList) {
@@ -185,6 +248,19 @@ public class CommandeJpaController implements Serializable {
         } finally {
             em.close();
         }
+    }
+    
+    
+    
+    public List<Commande> commandeValides(){
+        
+        return this.emf.createEntityManager().createNamedQuery("Commande.findByDeleted",Commande.class).setParameter("deleted", false).getResultList();
+       
+    }
+    
+    public List<Commande> commandeDeleted(){
+        return this.emf.createEntityManager().createNamedQuery("Commande.findByDeleted",Commande.class).setParameter("deleted", true).getResultList();
+       
     }
     
 }
