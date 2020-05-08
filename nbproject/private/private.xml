@@ -2,13 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/ListDesCommandesPresents.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/crud_methods/CommandeJpaController.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/ecrans/CommandeEcran.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/classes/Commande.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/geststock/dialog/FactureDialog.java</file>
-            <file>file:/home/ilboudo/Documents/GestStock/GESTSTOCK2/src/Impressions/FactureTTC.jrxml</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

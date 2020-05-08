@@ -62,7 +62,7 @@ public class Commande implements Serializable {
     private double montantHt;
     @Column(name = "montant_ttc")
     private Double montantTtc;
-    //@Column(name = "idclient")
+    @Column(name = "idclient")
     @JoinColumn(name = "idclient", referencedColumnName = "idclient")
     @ManyToOne
     private Client idclient;
